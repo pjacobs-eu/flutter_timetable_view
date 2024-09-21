@@ -25,6 +25,16 @@ class _TimetableViewState extends State<TimetableView>
   @override
   void initState() {
     initController();
+    horizontalPixelsStream.stream.listen((pixels) {
+      transCon.value = Matrix4.identity()
+        ..translate(-pixels, 0.0);
+    });
+
+    verticalPixelsStream.stream.listen((pixels) {
+      transCon.value = Matrix4.identity()
+        ..translate(0.0, -pixels);
+    });
+
     super.initState();
   }
 
@@ -36,14 +46,14 @@ class _TimetableViewState extends State<TimetableView>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return InteractiveViewer(child: Stack(
       children: <Widget>[
         _buildCorner(),
         _buildMainContent(context),
         _buildTimelineList(context),
         _buildLaneList(context),
       ],
-    );
+    ), constrained: false,);
   }
 
   Widget _buildCorner() {
@@ -60,30 +70,22 @@ class _TimetableViewState extends State<TimetableView>
     );
   }
 
+  var transCon = new TransformationController();
+
   Widget _buildMainContent(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
         left: widget.timetableStyle.timeItemWidth,
         top: widget.timetableStyle.laneHeight,
       ),
-      child: DiagonalScrollView(
-        horizontalPixelsStreamController: horizontalPixelsStream,
-        verticalPixelsStreamController: verticalPixelsStream,
-        onScroll: onScroll,
-        maxWidth:
-            widget.laneEventsList.length * widget.timetableStyle.laneWidth,
-        maxHeight:
-            (widget.timetableStyle.endHour - widget.timetableStyle.startHour) *
-                widget.timetableStyle.timeItemHeight,
-        child: IntrinsicHeight(
-          child: Row(
-            children: widget.laneEventsList.map((laneEvents) {
-              return LaneView(
-                events: laneEvents.events,
-                timetableStyle: widget.timetableStyle,
-              );
-            }).toList(),
-          ),
+      child: IntrinsicHeight(
+        child: Row(
+          children: widget.laneEventsList.map((laneEvents) {
+            return LaneView(
+              events: laneEvents.events,
+              timetableStyle: widget.timetableStyle,
+            );
+          }).toList(),
         ),
       ),
     );
