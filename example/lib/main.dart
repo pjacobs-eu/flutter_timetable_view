@@ -31,6 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: TimetableView(
         laneEventsList: _buildLaneEvents(),
         timetableStyle: TimetableStyle(),
+        stickyMode: true,
       ),
     );
   }
